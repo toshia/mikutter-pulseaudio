@@ -34,7 +34,7 @@ Plugin.create(:pulseaudio) do
   # ==== Return
   # String デフォルトシンクの名前
   def default_sink
-    @default_sink ||= IO.popen("LC_ALL=C pactl stat".freeze, File::Constants::RDONLY){ |io|
+    @default_sink ||= IO.popen("sh -c \"LC_ALL=C pactl stat\"".freeze, File::Constants::RDONLY){ |io|
       target_line = io.find{ |line| line.start_with?("Default Sink".freeze) }
       target_line.match(/^Default Sink\s*:\s*(.+)$/)[1] if target_line } end
 
