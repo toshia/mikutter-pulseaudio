@@ -35,7 +35,7 @@ Plugin.create(:pulseaudio) do
   # ==== Return
   # String デフォルトシンクの名前
   def default_sink
-    @default_sink ||= Open3.popen2({"LC_ALL" => "C".freeze} ,"pactl stat".freeze){ |input, output, _|
+    @default_sink ||= Open3.popen2({"LC_ALL" => "C".freeze} ,"pactl info".freeze){ |input, output, _|
       input.close
       target_line = output.find{ |line| line.start_with?("Default Sink".freeze) }
       if target_line
@@ -44,5 +44,3 @@ Plugin.create(:pulseaudio) do
         result end } end
 
 end
-
-
