@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 require 'shellwords'
+require 'open3'
 
 Plugin.create(:pulseaudio) do
   defsound :pulseaudio, "PulseAudio" do |filename|
@@ -34,8 +35,14 @@ Plugin.create(:pulseaudio) do
   # ==== Return
   # String デフォルトシンクの名前
   def default_sink
-    @default_sink ||= IO.popen("sh -c \"LC_ALL=C pactl stat\"".freeze, File::Constants::RDONLY){ |io|
-      target_line = io.find{ |line| line.start_with?("Default Sink".freeze) }
-      target_line.match(/^Default Sink\s*:\s*(.+)$/)[1] if target_line } end
+    @default_sink ||= Open3.popen2({"LC_ALL" => "C".freeze} ,"pactl stat".freeze){ |input, output, _|
+      input.close
+      target_line = output.find{ |line| line.start_with?("Default Sink".freeze) }
+      if target_line
+        result = target_line.match(/^Default Sink\s*:\s*(.+)$/)[1]
+        notice "detected default sink: #{result}"
+        result end } end
 
 end
+
+
